@@ -3,6 +3,7 @@ package com.example.demo;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.HeaderParameter;
 import org.springdoc.api.OpenApiCustomiser;
 import org.springframework.boot.SpringApplication;
@@ -33,4 +34,8 @@ public class SpringdocWebfluxContextApplication {
         .forEach(operation -> operation.addParametersItem(new HeaderParameter().$ref("#/components/parameters/myConsumerTypeHeader")));
   }
 
+  @Bean
+  public OpenApiCustomiser microtypeOpenAPICustomiser() {
+    return openApi -> openApi.getComponents().addSchemas("TweetId", new StringSchema());
+  }
 }
