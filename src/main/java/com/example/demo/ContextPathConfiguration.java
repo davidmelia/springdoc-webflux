@@ -4,6 +4,7 @@ import static org.springdoc.core.Constants.API_DOCS_URL;
 import static org.springdoc.core.Constants.DEFAULT_VALIDATOR_URL;
 import static org.springdoc.core.Constants.DEFAULT_WEB_JARS_PREFIX_URL;
 import static org.springdoc.core.Constants.SWAGGER_UI_PATH;
+import static org.springdoc.core.Constants.SWAGGER_UI_URL;
 import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
 import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
@@ -42,8 +43,11 @@ public class ContextPathConfiguration {
     StringBuilder sbUrl = new StringBuilder();
     sbUrl.append(contextPath);
     sbUrl.append(DEFAULT_WEB_JARS_PREFIX_URL);
+    sbUrl.append(SWAGGER_UI_URL);
     sbUrl.append(contextPath + apiDocsUrl);
     sbUrl.append(DEFAULT_VALIDATOR_URL);
+    System.out.println(sbUrl.toString());
+    System.out.println(contextPath + uiPath);
     return route(GET(contextPath + uiPath), req -> ServerResponse.temporaryRedirect(URI.create(sbUrl.toString())).build());
   }
 
