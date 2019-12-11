@@ -46,8 +46,6 @@ public class ContextPathConfiguration {
     sbUrl.append(SWAGGER_UI_URL);
     sbUrl.append(contextPath + apiDocsUrl);
     sbUrl.append(DEFAULT_VALIDATOR_URL);
-    System.out.println(sbUrl.toString());
-    System.out.println(contextPath + uiPath);
     return route(GET(contextPath + uiPath), req -> ServerResponse.temporaryRedirect(URI.create(sbUrl.toString())).build());
   }
 
