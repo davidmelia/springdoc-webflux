@@ -1,11 +1,13 @@
 package com.example.demo;
 
-import static org.springdoc.core.Constants.*;
-import static org.springframework.web.reactive.function.server.RequestPredicates.*;
-import static org.springframework.web.reactive.function.server.RouterFunctions.*;
+import static org.springdoc.core.Constants.API_DOCS_URL;
+import static org.springdoc.core.Constants.DEFAULT_VALIDATOR_URL;
+import static org.springdoc.core.Constants.DEFAULT_WEB_JARS_PREFIX_URL;
+import static org.springdoc.core.Constants.SWAGGER_UI_PATH;
+import static org.springframework.web.reactive.function.server.RequestPredicates.GET;
+import static org.springframework.web.reactive.function.server.RouterFunctions.route;
 
 import java.net.URI;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -39,44 +41,28 @@ public class ContextPathConfiguration {
   RouterFunction<ServerResponse> routerFunction2() {
     StringBuilder sbUrl = new StringBuilder();
     sbUrl.append(contextPath);
-    sbUrl.append(WEB_JARS_URL);
+    sbUrl.append(DEFAULT_WEB_JARS_PREFIX_URL);
     sbUrl.append(contextPath + apiDocsUrl);
     sbUrl.append(DEFAULT_VALIDATOR_URL);
     return route(GET(contextPath + uiPath), req -> ServerResponse.temporaryRedirect(URI.create(sbUrl.toString())).build());
   }
 
-//  @Bean
-//  public WebFluxConfigurer webJarsConfigurer() {
-//    return new WebFluxConfigurer() {
-//      @Override
-//      public void addResourceHandlers(ResourceHandlerRegistry registry) {
-//        registry.addResourceHandler(contextPath + "/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/").resourceChain(false);
-//      }
-//
-//      @Override
-//      public void configurePathMatching(PathMatchConfigurer configurer) {
-//
-//        configurer.addPathPrefix(contextPath, HandlerTypePredicate.forAnyHandlerType());
-//      }
-//    };
-//  }
 
-	@Bean
-	@ConditionalOnProperty("server.servlet.context-path")
-	@Order(Ordered.HIGHEST_PRECEDENCE)
-	public WebFilter contextPathWebFilter(ServerProperties serverProperties) {
-		String contextPath = serverProperties.getServlet().getContextPath();
-		return (exchange, chain) -> {
-			ServerHttpRequest request = exchange.getRequest();
-			String requestPath = request.getURI().getPath();
-			if (requestPath.startsWith(contextPath + "/") || requestPath.equals(contextPath)) {
-				return chain
-						.filter(exchange.mutate().request(request.mutate().contextPath(contextPath).build()).build());
+  @Bean
+  @ConditionalOnProperty("server.servlet.context-path")
+  @Order(Ordered.HIGHEST_PRECEDENCE)
+  public WebFilter contextPathWebFilter(ServerProperties serverProperties) {
+    String contextPath = serverProperties.getServlet().getContextPath();
+    return (exchange, chain) -> {
+      ServerHttpRequest request = exchange.getRequest();
+      String requestPath = request.getURI().getPath();
+      if (requestPath.startsWith(contextPath + "/") || requestPath.equals(contextPath)) {
+        return chain.filter(exchange.mutate().request(request.mutate().contextPath(contextPath).build()).build());
 
-			} else {
-				throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-			}
+      } else {
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+      }
 
-		};
-	}
+    };
+  }
 }
